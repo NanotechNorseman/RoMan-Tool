@@ -38,6 +38,10 @@ param (
     [switch]
     $h = $false,
 
+	# Add an XML digest
+	[switch]
+	$xml = $false,
+
 	# Force overwrite (default will re-name old)
 	[switch]
 	$f = $false
