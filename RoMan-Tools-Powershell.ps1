@@ -7,11 +7,11 @@
 
 
 param (
-    # First we define the format type.  Format type must be either HTML or XML
-    [Parameter(Mandatory=$true)]
-    [ValidateSet("HTML","html","XML","xml")]
-    [string]
-    $format = $( Read-Host "Please input desired format (HTML or XML): " ),
+    # First we define the format type.  Format type must be either HTML or XML - Deprecated - We will generate both
+    # [Parameter(Mandatory=$true)]
+    # [ValidateSet("HTML","html","XML","xml")]
+    # [string]
+    # $format = $( Read-Host "Please input desired format (HTML or XML): " ),
     
     # Next we define the location where we are probing
     [Parameter(Mandatory=$true)]
@@ -27,7 +27,7 @@ param (
     [Parameter(Mandatory=$false)]
     [ValidateSet("md5","MD5","sha256","SHA256","sha512","SHA512")]
     [string]
-    $hash,
+    $hash = "md5",
 
     # Location of the log file if defined
     [Parameter(Mandatory=$false)]
@@ -70,7 +70,8 @@ If (Get-ChildItem -Path $srcDir -Recurse | Where-Object { !$PsIsContainer -and [
 		}
 }
 
-# Create Manifest file with currect code
-New-Item $srcDir\Roman-Manifest.$format -ItemType File
+# Create Manifest and HTML Index file
+New-Item $srcDir\index.html -ItemType File
 
-# Cycle through lines and write output to the manifest
+# Cycle through lines and write output to the manifest xml
+Get-ChildItem  -Path $srcDir -Recurse | Export-Clixml
