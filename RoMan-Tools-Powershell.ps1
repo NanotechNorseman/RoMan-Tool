@@ -11,12 +11,12 @@ param (
     [Parameter(Mandatory=$true)]
     [ValidateSet("HTML","html","XML","xml")]
     [string]
-    $format,
+    $format = $( Read-Host "Please input desired format (HTML or XML): " ),
     
     # Next we define the location where we are probing
     [Parameter(Mandatory=$true)]
     [string]
-    $srcDir,
+    $srcDir = $( Read-Host "Please input the directory (and sub-directories) for the manifest: " ),
 
     # Now we define the location to place the manifest.  Default is $srcDir
     [Parameter(Mandatory=$false)]
@@ -36,7 +36,11 @@ param (
 
     # Help switch
     [switch]
-    $h = $false
+    $h = $false,
+
+	# Force overwrite (default will re-name old)
+	[switch]
+	$f = $false
 )
 
 # If the help switch is flipped, explain usage and exit with 0
@@ -48,5 +52,22 @@ if ($h) {
 # Load any external functions to the script
 . .\Write-Log.ps1
 
-# Begin the creation of the manifest
-New-Item 
+# Trim the trailing slashes from any directory entry
+$srcDir.TrimEnd('/\')
+$dstDir.TrimEnd('/\')
+
+# Variable Declaration
+$dtStamp = (Get-Date -Format MM-dd-yyyy_HHmmss)
+
+# Initialization for Manifest
+
+# Check if a previous manifest exists and check for $force flag
+If (Get-ChildItem -Path $srcDir -Recurse | Where-Object { !$PsIsContainer -and [System.IO.Path]::GetFileNameWithoutExtension($_.Name) -eq "Roman-Manifest" } = $true) {
+	if ($f = $true) {
+		Write-Log -level WARN -message "Roman-Manifest already exists!  Renaming old manifest with current timestamp and proceeding." (&{If ($log -ne "" -or $false) {-log $log}})
+		$exitName = "Roman-Manifest-$dtStamp"
+		Get-ChildItem -Filter "Roman-Manifest.*" -Recurse | Rename-Item -NewName {$_.Name -replace 'Roman-Manifest',$exitName }
+		}
+}
+
+New-Item $srcDir\Roman-Manifest.$format -ItemType File -Force
