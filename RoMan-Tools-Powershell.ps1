@@ -70,4 +70,7 @@ If (Get-ChildItem -Path $srcDir -Recurse | Where-Object { !$PsIsContainer -and [
 		}
 }
 
-New-Item $srcDir\Roman-Manifest.$format -ItemType File -Force
+# Create Manifest file with currect code
+New-Item $srcDir\Roman-Manifest.$format -ItemType File
+
+# Cycle through lines and write output to the manifest
